@@ -8,3 +8,5 @@
 
 # Artifacts
 bin/*
+/source/maindll/.vs
+/source/maindll/out/build/x64-Debug
