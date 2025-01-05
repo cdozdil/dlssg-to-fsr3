@@ -316,8 +316,31 @@ bool FFFrameInterpolator::BuildFrameInterpolationParameters(
 	if (desc.CameraFovAngleVertical > 10.0f)
 		desc.CameraFovAngleVertical *= std::numbers::pi_v<float> / 180.0f;
 
+	// If the game passes in 0, we'll use a default value.
+	if (desc.CameraFovAngleVertical == 0.0f)
+		desc.CameraFovAngleVertical = 1.0471975511966f;
+
 	desc.CameraNear = NGXParameters->GetFloatOrDefault("DLSSG.CameraNear", 0);
 	desc.CameraFar = NGXParameters->GetFloatOrDefault("DLSSG.CameraFar", 0);
+
+	// If the game passes in 0, we'll use a default value.
+	if (desc.CameraNear == 0.0f)
+	{
+		if (desc.DepthInverted)
+			desc.CameraNear = 100000.0f;
+		else
+			desc.CameraNear = 10.0f;
+	}
+
+	// If the game passes in 0, we'll use a default value.
+	if (desc.CameraFar == 0.0f)
+	{
+		if (desc.DepthInverted)
+			desc.CameraFar = 10.0f;
+		else
+			desc.CameraFar = 100000.0f;
+	}
+
 	desc.ViewSpaceToMetersFactor = 1.0f;
 
 	desc.MinMaxLuminance = m_HDRLuminanceRange;
