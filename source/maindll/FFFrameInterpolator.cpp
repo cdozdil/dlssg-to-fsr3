@@ -48,7 +48,7 @@ FfxErrorCode FFFrameInterpolator::Dispatch(void *CommandList, NGXInstanceParamet
 		const static bool doDebugTearLines = Util::GetSetting(L"Debug", L"EnableDebugTearLines", false);
 		const static bool doInterpolatedOnly = Util::GetSetting(L"Debug", L"EnableInterpolatedFramesOnly", false);
 
-		fsrFiDispatchDesc.DebugView = doDebugOverlay;
+		fsrFiDispatchDesc.DebugView = Util::FSRDebugViewEnabled.value_or(doDebugOverlay);
 		fsrFiDispatchDesc.DebugTearLines = doDebugTearLines;
 
 		// Record commands

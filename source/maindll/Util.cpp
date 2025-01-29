@@ -2,6 +2,12 @@
 #include <Windows.h>
 #include "Util.h"
 
+extern "C" __declspec(dllexport) void FSRDebugView(bool enable)
+{
+	Util::FSRDebugViewEnabled = enable;
+	spdlog::info("DebugView: {}", enable);
+}
+
 namespace Util
 {
 	const std::wstring& GetThisDllPath()
