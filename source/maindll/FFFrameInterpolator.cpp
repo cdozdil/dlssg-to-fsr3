@@ -329,14 +329,14 @@ bool FFFrameInterpolator::BuildFrameInterpolationParameters(
 		if (desc.DepthInverted)
 			desc.CameraNear = 100000.0f;
 		else
-			desc.CameraNear = 10.0f;
+			desc.CameraNear = 0.1f;
 	}
 
 	// If the game passes in 0, we'll use a default value.
 	if (desc.CameraFar == 0.0f)
 	{
 		if (desc.DepthInverted)
-			desc.CameraFar = 10.0f;
+			desc.CameraFar = 0.1f;
 		else
 			desc.CameraFar = 100000.0f;
 	}
