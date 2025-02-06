@@ -172,6 +172,25 @@ NGXDLLEXPORT NGXResult NVSDK_NGX_D3D12_Init_Ext(void *Unknown1, const wchar_t *P
 	else
 		spdlog::warn("Hardware accelerated GPU scheduling is disabled on this adapter.");
 
+	auto hasPresentMeteringAPI = [&]()
+	{
+		const auto handle = LoadLibraryExW(L"nvapi64.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+
+		if (!handle)
+			return false;
+
+		const auto queryInterface = reinterpret_cast<void *(__stdcall *)(uint32_t)>(GetProcAddress(handle, "nvapi_QueryInterface"));
+		const auto setFlipConfig = queryInterface ? queryInterface(0xF3148C42) : nullptr;
+
+		FreeLibrary(handle);
+		return setFlipConfig != nullptr;
+	};
+
+	if (hasPresentMeteringAPI())
+		spdlog::info("Present metering interface is available.");
+	else
+		spdlog::info("Present metering interface is unimplemented.");
+
 	return NGX_SUCCESS;
 }
 
@@ -212,6 +231,21 @@ static NGXResult EstimateVRAMCallback(
 	return NGX_SUCCESS;
 }
 
+NGXDLLEXPORT NGXResult NVSDK_NGX_D3D12_PopulateDeviceParameters_Impl(ID3D12Device *D3DDevice, NGXInstanceParameters *Parameters)
+{
+	spdlog::info(__FUNCTION__);
+
+	if (!D3DDevice || !Parameters)
+		return NGX_INVALID_PARAMETER;
+
+	Parameters->SetVoidPointer("DLSSG.GetCurrentSettingsCallback", &GetCurrentSettingsCallback);
+	Parameters->SetVoidPointer("DLSSG.EstimateVRAMCallback", &EstimateVRAMCallback);
+	Parameters->Set5("DLSSG.MultiFrameCountMax", 1);
+	Parameters->Set4("DLSSG.ReflexWarp.Available", 0);
+
+	return NGX_SUCCESS;
+}
+
 NGXDLLEXPORT NGXResult NVSDK_NGX_D3D12_PopulateParameters_Impl(NGXInstanceParameters *Parameters)
 {
 	spdlog::info(__FUNCTION__);
@@ -221,6 +255,8 @@ NGXDLLEXPORT NGXResult NVSDK_NGX_D3D12_PopulateParameters_Impl(NGXInstanceParame
 
 	Parameters->SetVoidPointer("DLSSG.GetCurrentSettingsCallback", &GetCurrentSettingsCallback);
 	Parameters->SetVoidPointer("DLSSG.EstimateVRAMCallback", &EstimateVRAMCallback);
+	Parameters->Set5("DLSSG.MultiFrameCountMax", 1);
+	Parameters->Set4("DLSSG.ReflexWarp.Available", 0);
 
 	return NGX_SUCCESS;
 }
