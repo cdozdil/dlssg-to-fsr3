@@ -56,7 +56,7 @@ FfxErrorCode FFFrameInterpolator::Dispatch(void *CommandList, NGXInstanceParamet
 		if (!BuildFrameInterpolationParameters(&fsrFiDispatchDesc, NGXParameters))
 			return FFX_ERROR_INVALID_ARGUMENT;
 
-		fsrFiDispatchDesc.DebugView = g_EnableDebugOverlay;
+		fsrFiDispatchDesc.DebugView = Util::FSRDebugViewStatus().value_or(g_EnableDebugOverlay);
 		fsrFiDispatchDesc.DebugTearLines = g_EnableDebugTearLines;
 
 		// Record commands

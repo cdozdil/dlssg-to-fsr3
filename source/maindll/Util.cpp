@@ -2,6 +2,14 @@
 #include <Windows.h>
 #include "Util.h"
 
+static std::optional<bool> FSRDebugViewEnabled;
+
+extern "C" __declspec(dllexport) void FSRDebugView(bool enable)
+{
+	FSRDebugViewEnabled = enable;
+	spdlog::info("DebugView: {}", enable);
+}
+
 namespace Util
 {
 	const std::wstring& GetThisDllPath()
@@ -65,5 +73,10 @@ namespace Util
 
 		const static auto iniPath = GetThisDllPath() + L"\\dlssg_to_fsr3.ini";
 		return GetPrivateProfileIntW(L"Debug", Key, DefaultValue, iniPath.c_str()) != 0;
+	}
+
+	std::optional<bool> FSRDebugViewStatus()
+	{
+		return FSRDebugViewEnabled;
 	}
 }
